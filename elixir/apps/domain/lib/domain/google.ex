@@ -18,11 +18,6 @@ defmodule Domain.Google do
     |> Repo.all()
   end
 
-  def create_auth_provider(attrs, %Accounts.Account{} = account) do
-    Google.AuthProvider.Changeset.create(attrs, account)
-    |> Repo.insert()
-  end
-
   def create_auth_provider(attrs, %Auth.Subject{} = subject) do
     required_permission = Google.Authorizer.manage_auth_providers_permission()
 
@@ -30,11 +25,6 @@ defmodule Domain.Google do
       Google.AuthProvider.Changeset.create(attrs, subject)
       |> Repo.insert()
     end
-  end
-
-  def create_directory(attrs, %Accounts.Account{} = account) do
-    Google.Directory.Changeset.create(attrs, account)
-    |> Repo.insert()
   end
 
   def create_directory(attrs, %Auth.Subject{} = subject) do
@@ -53,13 +43,13 @@ defmodule Domain.Google do
     |> Repo.fetch(Google.Directory.Query)
   end
 
-  def fetch_auth_provider_by_id(
+  def fetch_auth_provider_by_auth_provider_id(
         %Accounts.Account{} = account,
-        id
+        auth_provider_id
       ) do
     Google.AuthProvider.Query.not_disabled()
     |> Google.AuthProvider.Query.by_account_id(account.id)
-    |> Google.AuthProvider.Query.by_id(id)
+    |> Google.AuthProvider.Query.by_auth_provider_id(auth_provider_id)
     |> Repo.fetch(Google.AuthProvider.Query)
   end
 
@@ -73,7 +63,7 @@ defmodule Domain.Google do
     with :ok <- Auth.ensure_has_permissions(subject, required_permission) do
       Google.AuthProvider.Query.all()
       |> Google.AuthProvider.Query.by_account_id(subject.account.id)
-      |> Google.AuthProvider.Query.by_id(auth_provider.id)
+      |> Google.AuthProvider.Query.by_auth_provider_id(auth_provider.auth_provider_id)
       |> Repo.fetch_and_update(Google.AuthProvider.Query,
         with: &Google.AuthProvider.Changeset.update(&1, attrs)
       )

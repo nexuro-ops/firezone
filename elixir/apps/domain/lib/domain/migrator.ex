@@ -6,7 +6,8 @@ defmodule Domain.Migrator do
   """
 
   alias Domain.{
-    Accounts
+    Accounts,
+    Firezone
   }
 
   def up(%Accounts.Account{} = _account) do
@@ -37,5 +38,12 @@ defmodule Domain.Migrator do
   end
 
   def down(%Accounts.Account{} = _account) do
+  end
+
+  def migrated?(%Accounts.Account{} = account) do
+    case Firezone.fetch_directory_by_account(account) do
+      {:ok, _directory} -> true
+      {:error, :not_found} -> false
+    end
   end
 end

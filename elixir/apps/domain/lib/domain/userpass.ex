@@ -15,7 +15,7 @@ defmodule Domain.Userpass do
     end
   end
 
-  def fetch_auth_provider_for_account(%Accounts.Account{} = account) do
+  def fetch_auth_provider_by_account(%Accounts.Account{} = account) do
     Userpass.AuthProvider.Query.not_disabled()
     |> Userpass.AuthProvider.Query.by_account_id(account.id)
     |> Repo.fetch(Userpass.AuthProvider.Query)

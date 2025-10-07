@@ -36,5 +36,7 @@ defmodule Domain.Repo.Migrations.CreateOktaDirectories do
     ALTER TABLE okta_directories
     DROP CONSTRAINT okta_directories_directory_id_fkey
     """
+
+    execute(up, down)
   end
 end

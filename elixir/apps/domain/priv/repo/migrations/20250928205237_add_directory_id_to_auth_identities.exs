@@ -9,6 +9,7 @@ defmodule Domain.Repo.Migrations.AddDirectoryIdToAuthIdentities do
     create(
       index(:auth_identities, [:account_id, :directory_id, :provider_identifier],
         unique: true,
+        name: :auth_identities_account_directory_provider_identifier_index,
         where:
           "deleted_at IS NULL AND directory_id IS NOT NULL AND provider_identifier IS NOT NULL"
       )
@@ -17,6 +18,7 @@ defmodule Domain.Repo.Migrations.AddDirectoryIdToAuthIdentities do
     create(
       index(:auth_identities, [:account_id, :directory_id, :email],
         unique: true,
+        name: :auth_identities_account_directory_email_index,
         where: "deleted_at IS NULL AND directory_id IS NOT NULL AND provider_identifier IS NULL"
       )
     )

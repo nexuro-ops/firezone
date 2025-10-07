@@ -386,9 +386,12 @@ defmodule Domain.Repo.Seeds do
 
     {:ok, _google_identity} =
       Identities.create_identity_for_directory(
-        account,
-        %Directories.Directory{type: :google, id: google_directory.directory_id},
         admin_actor,
+        %Directories.Directory{
+          account_id: account.id,
+          type: :google,
+          id: google_directory.directory_id
+        },
         %{
           "sub" => "CHANGE_ME",
           "email" => "firezone@localhost.local"
@@ -413,9 +416,12 @@ defmodule Domain.Repo.Seeds do
 
     {:ok, _entra_identity} =
       Identities.create_identity_for_directory(
-        account,
-        %Directories.Directory{type: :entra, id: entra_directory.directory_id},
         admin_actor,
+        %Directories.Directory{
+          account_id: account.id,
+          type: :entra,
+          id: entra_directory.directory_id
+        },
         %{
           "oid" => "CHANGE_ME",
           "email" => "firezone@localhost.local"
@@ -437,9 +443,12 @@ defmodule Domain.Repo.Seeds do
 
     {:ok, _okta_identity} =
       Identities.create_identity_for_directory(
-        account,
-        %Directories.Directory{type: :okta, id: okta_directory.directory_id},
         admin_actor,
+        %Directories.Directory{
+          account_id: account.id,
+          type: :okta,
+          id: okta_directory.directory_id
+        },
         %{
           "sub" => "CHANGE_ME",
           "email" => "firezone@localhost.local"
@@ -458,7 +467,7 @@ defmodule Domain.Repo.Seeds do
         admin_subject
       )
 
-    {:ok, firezone_directory} = Domain.Firezone.create_directory(%{}, account)
+    {:ok, _firezone_directory} = Domain.Firezone.create_directory(%{}, admin_subject)
 
     {:ok, service_account_actor_encoded_token} =
       Auth.create_service_account_token(

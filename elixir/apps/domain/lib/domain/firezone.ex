@@ -1,20 +1,19 @@
 defmodule Domain.Firezone do
   alias Domain.{
-    Auth,
     Accounts,
+    Auth,
     Firezone,
     Repo
   }
 
-  def create_directory(attrs, %Accounts.Account{} = account) do
-    Firezone.Directory.Changeset.create(attrs, account)
+  def create_directory(attrs, %Auth.Subject{} = subject) do
+    Firezone.Directory.Changeset.create(attrs, subject)
     |> Repo.insert()
   end
 
-  def fetch_directory_by_directory_id(%Accounts.Account{} = account, directory_id) do
+  def fetch_directory_by_account(%Accounts.Account{} = account) do
     Firezone.Directory.Query.all()
     |> Firezone.Directory.Query.by_account_id(account.id)
-    |> Firezone.Directory.Query.by_directory_id(directory_id)
     |> Repo.fetch(Firezone.Directory.Query)
   end
 

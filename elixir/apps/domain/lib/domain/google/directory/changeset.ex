@@ -2,26 +2,18 @@ defmodule Domain.Google.Directory.Changeset do
   use Domain, :changeset
 
   alias Domain.{
-    Accounts,
     Auth,
     Google.Directory
   }
 
   @required_fields ~w[name account_id hosted_domain created_by created_by_subject]a
-  @update_fields ~w[jit_provisioning name hosted_domain error_count disabled_at disabled_reason synced_at error error_emailed_at]a
-
-  def create(attrs, %Accounts.Account{} = account) do
-    %Directory{}
-    |> cast(attrs, @required_fields)
-    |> put_change(:account_id, account.id)
-    |> put_subject_trail(:created_by, :system)
-    |> maybe_create_parent_directory(account.id)
-    |> changeset()
-  end
+  @create_fields @required_fields ++ ~w[jit_provisioning superadmin_email impersonation_email]a
+  @update_fields ~w[superadmin_email superadmin_emailed_at impersonation_email jit_provisioning name
+    hosted_domain error_count disabled_at disabled_reason synced_at error error_emailed_at]a
 
   def create(attrs, %Auth.Subject{} = subject) do
     %Directory{}
-    |> cast(attrs, @required_fields)
+    |> cast(attrs, @create_fields)
     |> put_change(:account_id, subject.account.id)
     |> put_subject_trail(:created_by, subject)
     |> maybe_create_parent_directory(subject.account.id)

@@ -1,7 +1,7 @@
 defmodule Domain.Auth.Provider do
   use Domain, :schema
 
-  schema "auth_providers" do
+  schema "legacy_auth_providers" do
     field :name, :string
 
     field :adapter, Ecto.Enum,

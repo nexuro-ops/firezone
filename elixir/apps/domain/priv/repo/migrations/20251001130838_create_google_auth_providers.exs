@@ -5,7 +5,7 @@ defmodule Domain.Repo.Migrations.CreateGoogleAuthProviders do
     create table(:google_auth_providers, primary_key: false) do
       account()
 
-      add(:id, :binary_id, primary_key: true)
+      add(:auth_provider_id, :binary_id, null: false, primary_key: true)
       add(:directory_id, :binary_id, null: false)
 
       add(:name, :string, null: false)
@@ -19,17 +19,32 @@ defmodule Domain.Repo.Migrations.CreateGoogleAuthProviders do
     create(index(:google_auth_providers, [:account_id, :hosted_domain], unique: true))
     create(index(:google_auth_providers, [:account_id, :name], unique: true))
 
-    up = """
-    ALTER TABLE google_auth_providers
-    ADD CONSTRAINT google_auth_providers_directory_id_fkey
-    FOREIGN KEY (account_id, directory_id)
-    REFERENCES directories(account_id, id)
-    ON DELETE CASCADE
-    """
+    execute(
+      """
+      ALTER TABLE google_auth_providers
+      ADD CONSTRAINT google_auth_providers_auth_provider_id_fkey
+      FOREIGN KEY (account_id, auth_provider_id)
+      REFERENCES auth_providers(account_id, id)
+      ON DELETE CASCADE
+      """,
+      """
+      ALTER TABLE google_auth_providers
+      DROP CONSTRAINT google_auth_providers_auth_provider_id_fkey
+      """
+    )
 
-    down = """
-    ALTER TABLE google_auth_providers
-    DROP CONSTRAINT google_auth_providers_directory_id_fkey
-    """
+    execute(
+      """
+      ALTER TABLE google_auth_providers
+      ADD CONSTRAINT google_auth_providers_directory_id_fkey
+      FOREIGN KEY (account_id, directory_id)
+      REFERENCES directories(account_id, id)
+      ON DELETE CASCADE
+      """,
+      """
+      ALTER TABLE google_auth_providers
+      DROP CONSTRAINT google_auth_providers_directory_id_fkey
+      """
+    )
   end
 end

@@ -1,6 +1,6 @@
 defmodule Domain.Auth.Identity.Changeset do
   use Domain, :changeset
-  alias Domain.Actors
+  alias Domain.{Actors, Directories}
   alias Domain.Auth.{Subject, Identity, Provider}
 
   def create_identity(
@@ -26,6 +26,21 @@ defmodule Domain.Auth.Identity.Changeset do
     |> maybe_put_email_from_identifier()
     |> put_change(:actor_id, actor.id)
     |> put_change(:provider_id, provider.id)
+    |> put_change(:account_id, account_id)
+    |> put_subject_trail(:created_by, :system)
+    |> changeset()
+  end
+
+  def create_identity(
+        %Actors.Actor{account_id: account_id} = actor,
+        %Directories.Directory{account_id: account_id} = directory,
+        attrs
+      ) do
+    %Identity{}
+    |> cast(attrs, ~w[email provider_identifier]a)
+    |> validate_required(~w[provider_identifier]a)
+    |> put_change(:actor_id, actor.id)
+    |> put_change(:directory_id, directory.id)
     |> put_change(:account_id, account_id)
     |> put_subject_trail(:created_by, :system)
     |> changeset()
@@ -71,6 +86,12 @@ defmodule Domain.Auth.Identity.Changeset do
     )
     |> unique_constraint(:email,
       name: :auth_identities_acct_id_provider_id_email_prov_ident_unique_idx
+    )
+    |> unique_constraint(:provider_identifier,
+      name: :auth_identities_account_directory_provider_identifier_index
+    )
+    |> unique_constraint(:email,
+      name: :auth_identities_account_directory_email_index
     )
     |> trim_change(~w[email provider_identifier]a)
   end

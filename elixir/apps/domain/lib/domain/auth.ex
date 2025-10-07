@@ -588,6 +588,20 @@ defmodule Domain.Auth do
   def identity_soft_deleted?(%{deleted_at: nil}), do: false
   def identity_soft_deleted?(_identity), do: true
 
+  def get_auth_context(remote_ip, user_agent, headers, type) do
+    {region, city, {lat, lon}} = Domain.Geo.location_from_headers(headers)
+
+    %Domain.Auth.Context{
+      type: type,
+      user_agent: user_agent,
+      remote_ip: remote_ip,
+      remote_ip_location_region: region,
+      remote_ip_location_city: city,
+      remote_ip_location_lat: lat,
+      remote_ip_location_lon: lon
+    }
+  end
+
   # Sign Up / In / Off
 
   @doc """

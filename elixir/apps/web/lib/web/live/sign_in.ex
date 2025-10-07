@@ -402,14 +402,14 @@ defmodule Web.SignIn do
   end
 
   defp email_auth_provider(account) do
-    case Email.fetch_auth_provider_for_account(account) do
+    case Email.fetch_auth_provider_by_account(account) do
       {:ok, provider} -> provider
       {:error, :not_found} -> nil
     end
   end
 
   defp userpass_auth_provider(account) do
-    case Userpass.fetch_auth_provider_for_account(account) do
+    case Userpass.fetch_auth_provider_by_account(account) do
       {:ok, provider} -> provider
       {:error, :not_found} -> nil
     end

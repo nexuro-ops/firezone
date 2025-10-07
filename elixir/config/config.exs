@@ -56,6 +56,7 @@ config :domain, Domain.ChangeLogs.ReplicationConnection,
     actor_groups
     actors
     auth_identities
+    legacy_auth_providers
     auth_providers
     clients
     gateway_groups

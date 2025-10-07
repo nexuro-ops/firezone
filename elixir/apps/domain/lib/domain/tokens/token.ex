@@ -14,6 +14,9 @@ defmodule Domain.Tokens.Token do
 
     field :name, :string
 
+    # track which auth provider was used to authenticate
+    belongs_to :auth_provider, Domain.AuthProviders.AuthProvider
+
     # set for browser and client tokens, empty for service account tokens
     belongs_to :identity, Domain.Auth.Identity
     # set for browser and client tokens

@@ -8,6 +8,9 @@ defmodule Domain.Google.Directory do
 
     field :name, :string
     field :hosted_domain, :string
+    field :superadmin_email, :string
+    field :superadmin_emailed_at, :utc_datetime_usec
+    field :impersonation_email, :string
     field :error_count, :integer, read_after_writes: true
     field :disabled_at, :utc_datetime_usec
     field :disabled_reason, :string

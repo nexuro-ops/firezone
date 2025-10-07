@@ -9,5 +9,11 @@ defmodule Domain.Repo.Migrations.CreateDirectories do
     end
 
     create(index(:directories, [:account_id, :type], unique: true, where: "type = 'firezone'"))
+
+    create(
+      constraint(:directories, :type_must_be_valid,
+        check: "type IN ('okta', 'google', 'entra', 'firezone')"
+      )
+    )
   end
 end

@@ -15,7 +15,7 @@ defmodule Domain.Email do
     end
   end
 
-  def fetch_auth_provider_for_account(%Accounts.Account{} = account) do
+  def fetch_auth_provider_by_account(%Accounts.Account{} = account) do
     Email.AuthProvider.Query.not_disabled()
     |> Email.AuthProvider.Query.by_account_id(account.id)
     |> Repo.fetch(Email.AuthProvider.Query)

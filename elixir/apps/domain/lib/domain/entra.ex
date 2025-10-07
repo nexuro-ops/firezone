@@ -18,11 +18,6 @@ defmodule Domain.Entra do
     |> Repo.all()
   end
 
-  def create_auth_provider(attrs, %Accounts.Account{} = account) do
-    Entra.AuthProvider.Changeset.create(attrs, account)
-    |> Repo.insert()
-  end
-
   def create_auth_provider(attrs, %Auth.Subject{} = subject) do
     required_permission = Entra.Authorizer.manage_auth_providers_permission()
 
@@ -30,11 +25,6 @@ defmodule Domain.Entra do
       Entra.AuthProvider.Changeset.create(attrs, subject)
       |> Repo.insert()
     end
-  end
-
-  def create_directory(attrs, %Accounts.Account{} = account) do
-    Entra.Directory.Changeset.create(attrs, account)
-    |> Repo.insert()
   end
 
   def create_directory(attrs, %Auth.Subject{} = subject) do
@@ -46,13 +36,13 @@ defmodule Domain.Entra do
     end
   end
 
-  def fetch_auth_provider_by_id(
+  def fetch_auth_provider_by_auth_provider_id(
         %Accounts.Account{} = account,
-        id
+        auth_provider_id
       ) do
     Entra.AuthProvider.Query.not_disabled()
     |> Entra.AuthProvider.Query.by_account_id(account.id)
-    |> Entra.AuthProvider.Query.by_id(id)
+    |> Entra.AuthProvider.Query.by_auth_provider_id(auth_provider_id)
     |> Repo.fetch(Entra.AuthProvider.Query)
   end
 end

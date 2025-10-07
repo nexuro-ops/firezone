@@ -2,21 +2,11 @@ defmodule Domain.Okta.Directory.Changeset do
   use Domain, :changeset
 
   alias Domain.{
-    Accounts,
     Auth,
     Okta.Directory
   }
 
   @required_fields ~w[name account_id org_domain created_by created_by_subject]a
-
-  def create(attrs, %Accounts.Account{} = account) do
-    %Directory{}
-    |> cast(attrs, @required_fields ++ [:jit_provisioning])
-    |> put_change(:account_id, account.id)
-    |> put_subject_trail(:created_by, :system)
-    |> maybe_create_parent_directory(account.id)
-    |> changeset()
-  end
 
   def create(attrs, %Auth.Subject{} = subject) do
     %Directory{}

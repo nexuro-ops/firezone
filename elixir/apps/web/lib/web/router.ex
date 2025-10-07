@@ -88,7 +88,7 @@ defmodule Web.Router do
       Web.Plugs.AutoRedirectDefaultProvider
     ]
 
-    get "/sign_in/:provider_type/:provider_id", OIDCController, :sign_in
+    get "/sign_in/:auth_provider_type/:auth_provider_id", OIDCController, :sign_in
 
     live_session :redirect_if_user_is_authenticated,
       on_mount: [

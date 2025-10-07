@@ -13,8 +13,8 @@ defmodule Domain.Okta.AuthProvider.Query do
     where(queryable, [providers: providers], providers.account_id == ^account_id)
   end
 
-  def by_id(querable, id) do
-    where(querable, [providers: providers], providers.id == ^id)
+  def by_auth_provider_id(querable, auth_provider_id) do
+    where(querable, [providers: providers], providers.auth_provider_id == ^auth_provider_id)
   end
 
   def by_directory_id(queryable, directory_id) do
