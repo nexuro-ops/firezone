@@ -43,7 +43,7 @@ defmodule Web.OIDCController do
 
   def sign_in(conn, %{"account_id_or_slug" => account_id_or_slug} = params) do
     with {:ok, account} <- Accounts.fetch_account_by_id_or_slug(account_id_or_slug),
-         {:ok, provider} <- fetch_provider(account, params),
+         {:ok, provider} <- fetch_auth_provider(account, params),
          {:ok, config} <- fetch_config(provider) do
       provider_redirect(conn, account, config, params)
     else
@@ -89,12 +89,9 @@ defmodule Web.OIDCController do
           "params" => sanitize(params)
         }
 
-      conn =
-        conn
-        |> put_resp_cookie(@cookie_key, cookie, @cookie_options)
-        |> redirect(external: uri)
-
-      {:ok, conn}
+      conn
+      |> put_resp_cookie(@cookie_key, cookie, @cookie_options)
+      |> redirect(external: uri)
     end
   end
 
@@ -148,7 +145,7 @@ defmodule Web.OIDCController do
     OIDC.fetch_auth_provider_by_auth_provider_id(account, auth_provider_id)
   end
 
-  defp fetch_provider(_account, _provider) do
+  defp fetch_auth_provider(_account, _provider) do
     {:error, :invalid_provider}
   end
 
