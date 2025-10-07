@@ -131,7 +131,7 @@ config :domain, Domain.Analytics,
 
 config :domain, Domain.Google.AuthProvider,
   # Should match an external OAuth2 client in Google Cloud Console
-  client_id: "1089352316583-hb01caep30rk7k5ko44pcjvlvfgbb9jg.apps.googleusercontent.com",
+  client_id: System.get_env("GOOGLE_OIDC_CLIENT_ID"),
   client_secret: System.get_env("GOOGLE_OIDC_CLIENT_SECRET"),
   response_type: "code",
   scope: "openid email profile",
@@ -144,7 +144,7 @@ config :domain, Domain.Okta.AuthProvider,
 
 config :domain, Domain.Entra.AuthProvider,
   # Should match an external OAuth2 client in Azure
-  client_id: "9f3cc329-c2f9-4f27-9dab-62aab9f0459a",
+  client_id: System.get_env("ENTRA_OIDC_CLIENT_ID"),
   client_secret: System.get_env("ENTRA_OIDC_CLIENT_SECRET"),
   response_type: "code",
   scope: "openid email profile"

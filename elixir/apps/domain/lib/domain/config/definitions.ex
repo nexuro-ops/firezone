@@ -530,8 +530,8 @@ defmodule Domain.Config.Definitions do
 
   defconfig(:google_oidc_client_id, :string, default: nil)
   defconfig(:google_oidc_client_secret, :string, default: nil, sensitive: true)
-  # defconfig(:entra_oidc_client_id, :string, default: nil)
-  # defconfig(:entra_oidc_client_secret, :string, default: nil, sensitive: true)
+  defconfig(:entra_oidc_client_id, :string, default: nil)
+  defconfig(:entra_oidc_client_secret, :string, default: nil, sensitive: true)
 
   # Okta uses a per-tenant client_id/secret
 
