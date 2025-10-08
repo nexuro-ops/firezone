@@ -382,7 +382,10 @@ defmodule Domain.Repo.Seeds do
       Auth.build_subject(admin_actor_token, admin_actor_context)
 
     {:ok, google_directory} =
-      Google.create_directory(%{name: "Google", hosted_domain: "firezone.dev"}, admin_subject)
+      Google.create_directory(
+        %{jit_provisioning: true, name: "Google", hosted_domain: "firezone.dev"},
+        admin_subject
+      )
 
     {:ok, _google_identity} =
       Identities.create_identity_for_directory(
@@ -410,7 +413,7 @@ defmodule Domain.Repo.Seeds do
 
     {:ok, entra_directory} =
       Entra.create_directory(
-        %{name: "Entra", tenant_id: "CHANGE_ME"},
+        %{jit_provisioning: true, name: "Entra", tenant_id: "CHANGE_ME"},
         admin_subject
       )
 
@@ -439,7 +442,10 @@ defmodule Domain.Repo.Seeds do
       )
 
     {:ok, okta_directory} =
-      Domain.Okta.create_directory(%{name: "Okta", org_domain: "CHANGE_ME"}, admin_subject)
+      Domain.Okta.create_directory(
+        %{jit_provisioning: true, name: "Okta", org_domain: "CHANGE_ME"},
+        admin_subject
+      )
 
     {:ok, _okta_identity} =
       Identities.create_identity_for_directory(
