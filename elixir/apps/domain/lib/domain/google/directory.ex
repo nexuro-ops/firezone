@@ -3,11 +3,10 @@ defmodule Domain.Google.Directory do
 
   @primary_key false
   schema "google_directories" do
-    belongs_to :account, Domain.Accounts.Account
-    belongs_to :directory, Domain.Directories.Directory, primary_key: true
+    belongs_to :account, Domain.Accounts.Account, primary_key: true
+    field :hosted_domain, :string, primary_key: true
 
     field :name, :string
-    field :hosted_domain, :string
     field :superadmin_email, :string
     field :superadmin_emailed_at, :utc_datetime_usec
     field :impersonation_email, :string
@@ -17,7 +16,6 @@ defmodule Domain.Google.Directory do
     field :synced_at, :utc_datetime_usec
     field :error, :string
     field :error_emailed_at, :utc_datetime_usec
-    field :jit_provisioning, :boolean
 
     subject_trail(~w[actor identity system]a)
     timestamps()

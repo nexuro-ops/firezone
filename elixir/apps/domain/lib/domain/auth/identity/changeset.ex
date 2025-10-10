@@ -1,7 +1,25 @@
 defmodule Domain.Auth.Identity.Changeset do
   use Domain, :changeset
-  alias Domain.{Actors, Directories}
+  alias Domain.Actors
   alias Domain.Auth.{Subject, Identity, Provider}
+
+  def create(
+        %Actors.Actor{} = actor,
+        attrs
+      ) do
+    %Identity{}
+    |> cast(
+      attrs,
+      ~w[issuer idp_id name given_name family_name middle_name nickname preferred_username profile picture]a
+    )
+    |> put_change(:actor_id, actor.id)
+    |> put_change(:account_id, actor.account_id)
+    |> assoc_constraint(:actor)
+    |> assoc_constraint(:account)
+    |> put_subject_trail(:created_by, :system)
+    |> validate_required(~w[actor_id account_id issuer idp_id]a)
+    |> changeset()
+  end
 
   def create_identity(
         %Actors.Actor{} = actor,
@@ -33,14 +51,12 @@ defmodule Domain.Auth.Identity.Changeset do
 
   def create_identity(
         %Actors.Actor{account_id: account_id} = actor,
-        %Directories.Directory{account_id: account_id} = directory,
         attrs
       ) do
     %Identity{}
     |> cast(attrs, ~w[email provider_identifier]a)
     |> validate_required(~w[provider_identifier]a)
     |> put_change(:actor_id, actor.id)
-    |> put_change(:directory_id, directory.id)
     |> put_change(:account_id, account_id)
     |> put_subject_trail(:created_by, :system)
     |> changeset()
@@ -87,13 +103,28 @@ defmodule Domain.Auth.Identity.Changeset do
     |> unique_constraint(:email,
       name: :auth_identities_acct_id_provider_id_email_prov_ident_unique_idx
     )
-    |> unique_constraint(:provider_identifier,
-      name: :auth_identities_account_directory_provider_identifier_index
+    |> unique_constraint(:base,
+      name: :auth_identities_account_issuer_idp_id_index,
+      message: "issuer, idp_id is already taken"
     )
-    |> unique_constraint(:email,
-      name: :auth_identities_account_directory_email_index
+    |> check_constraint(:base,
+      name: :issuer_idp_id_both_set_or_neither,
+      message: "issuer, idp_id must both be set or neither"
     )
-    |> trim_change(~w[email provider_identifier]a)
+    |> trim_change(~w[
+        issuer
+        idp_id
+        name
+        given_name
+        family_name
+        middle_name
+        nickname
+        preferred_username
+        profile
+        picture
+        email
+        provider_identifier
+      ]a)
   end
 
   def update_identity_provider_state(identity_or_changeset, %{} = state, virtual_state \\ %{}) do

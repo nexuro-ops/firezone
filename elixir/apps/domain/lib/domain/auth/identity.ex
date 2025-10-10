@@ -5,8 +5,21 @@ defmodule Domain.Auth.Identity do
     belongs_to :actor, Domain.Actors.Actor, on_replace: :update
     belongs_to :provider, Domain.Auth.Provider
 
+    # Unique identifiers
     field :email, :string
     field :provider_identifier, :string
+    field :issuer, :string
+    field :idp_id, :string
+
+    # Optional profile fields
+    field :name, :string
+    field :given_name, :string
+    field :family_name, :string
+    field :middle_name, :string
+    field :nickname, :string
+    field :preferred_username, :string
+    field :profile, :string
+    field :picture, :string
 
     # TODO: IdP sync
     # Remove these field after all customers have migrated to the new sync
@@ -22,7 +35,6 @@ defmodule Domain.Auth.Identity do
     field :last_seen_at, :utc_datetime_usec
 
     belongs_to :account, Domain.Accounts.Account
-    belongs_to :directory, Domain.Directories.Directory
 
     # TODO: HARD-DELETE - Remove `where` after `deleted_at` is removed from the DB
     has_many :clients, Domain.Clients.Client, where: [deleted_at: nil]

@@ -7,6 +7,7 @@ defmodule Domain.Auth.Roles do
       Domain.Actors.Authorizer,
       Domain.Actors.Group.Authorizer,
       Domain.Auth.Authorizer,
+      Domain.AuthProviders.Authorizer,
       Domain.Billing.Authorizer,
       Domain.Clients.Authorizer,
       Domain.Email.Authorizer,

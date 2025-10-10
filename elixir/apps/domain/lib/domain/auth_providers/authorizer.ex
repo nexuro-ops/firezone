@@ -1,20 +1,22 @@
-defmodule Domain.Firezone.Authorizer do
+defmodule Domain.AuthProviders.Authorizer do
   use Domain.Auth.Authorizer
 
-  alias Domain.Firezone.Directory
+  alias Domain.AuthProviders.{
+    AuthProvider
+  }
 
-  def manage_directories_permission, do: build(Directory, :manage)
+  def manage_auth_providers_permission, do: build(AuthProvider, :manage)
 
   @impl Domain.Auth.Authorizer
   def list_permissions_for_role(:account_admin_user) do
     [
-      manage_directories_permission()
+      manage_auth_providers_permission()
     ]
   end
 
   def list_permissions_for_role(:api_client) do
     [
-      manage_directories_permission()
+      manage_auth_providers_permission()
     ]
   end
 

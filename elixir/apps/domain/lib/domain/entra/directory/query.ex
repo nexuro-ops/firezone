@@ -13,10 +13,6 @@ defmodule Domain.Entra.Directory.Query do
     where(queryable, [directories: directories], directories.account_id == ^account_id)
   end
 
-  def by_directory_id(queryable, directory_id) do
-    where(queryable, [directories: directories], directories.directory_id == ^directory_id)
-  end
-
   def by_tenant_id(queryable, tenant_id) do
     where(queryable, [directories: directories], directories.tenant_id == ^tenant_id)
   end

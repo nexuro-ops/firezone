@@ -3,14 +3,11 @@ defmodule Domain.Repo.Migrations.CreateGoogleAuthProviders do
 
   def change do
     create table(:google_auth_providers, primary_key: false) do
-      account()
-
+      account(primary_key: true)
       add(:auth_provider_id, :binary_id, null: false, primary_key: true)
-      add(:directory_id, :binary_id, null: false)
 
       add(:name, :string, null: false)
       add(:hosted_domain, :string)
-      add(:disabled_at, :utc_datetime_usec)
 
       subject_trail()
       timestamps()
@@ -30,20 +27,6 @@ defmodule Domain.Repo.Migrations.CreateGoogleAuthProviders do
       """
       ALTER TABLE google_auth_providers
       DROP CONSTRAINT google_auth_providers_auth_provider_id_fkey
-      """
-    )
-
-    execute(
-      """
-      ALTER TABLE google_auth_providers
-      ADD CONSTRAINT google_auth_providers_directory_id_fkey
-      FOREIGN KEY (account_id, directory_id)
-      REFERENCES directories(account_id, id)
-      ON DELETE CASCADE
-      """,
-      """
-      ALTER TABLE google_auth_providers
-      DROP CONSTRAINT google_auth_providers_directory_id_fkey
       """
     )
   end

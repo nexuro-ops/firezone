@@ -6,7 +6,17 @@ defmodule Domain.Email.AuthProvider.Query do
   end
 
   def not_disabled(queryable \\ all()) do
-    where(queryable, [providers: providers], is_nil(providers.disabled_at))
+    join(
+      queryable,
+      :inner,
+      [providers: providers],
+      auth_providers in Domain.AuthProviders.AuthProvider,
+      as: :auth_providers,
+      on:
+        providers.account_id == auth_providers.account_id and
+          providers.auth_provider_id == auth_providers.id
+    )
+    |> where([auth_providers: auth_providers], is_nil(auth_providers.disabled_at))
   end
 
   def by_account_id(queryable, account_id) do

@@ -58,6 +58,12 @@ config :domain, Domain.ChangeLogs.ReplicationConnection,
     auth_identities
     legacy_auth_providers
     auth_providers
+    google_auth_providers
+    entra_auth_providers
+    okta_auth_providers
+    oidc_auth_providers
+    email_auth_providers
+    userpass_auth_providers
     clients
     gateway_groups
     gateways

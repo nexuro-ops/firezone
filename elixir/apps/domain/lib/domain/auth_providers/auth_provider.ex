@@ -7,6 +7,12 @@ defmodule Domain.AuthProviders.AuthProvider do
     field :id, :binary_id, primary_key: true, read_after_writes: true
     field :type, Ecto.Enum, values: ~w[email userpass google okta entra oidc]a
 
+    field :context, Ecto.Enum,
+      values: ~w[clients_and_portal clients_only portal_only]a,
+      default: :clients_and_portal
+
+    field :disabled_at, :utc_datetime_usec
+
     has_many :email_auth_providers, Domain.Email.AuthProvider,
       where: [type: :email],
       references: :id

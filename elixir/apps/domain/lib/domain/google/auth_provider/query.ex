@@ -6,7 +6,17 @@ defmodule Domain.Google.AuthProvider.Query do
   end
 
   def not_disabled(queryable \\ all()) do
-    where(queryable, [providers: providers], is_nil(providers.disabled_at))
+    join(
+      queryable,
+      :inner,
+      [providers: providers],
+      auth_providers in Domain.AuthProviders.AuthProvider,
+      as: :auth_providers,
+      on:
+        providers.account_id == auth_providers.account_id and
+          providers.auth_provider_id == auth_providers.id
+    )
+    |> where([auth_providers: auth_providers], is_nil(auth_providers.disabled_at))
   end
 
   def by_account_id(queryable, account_id) do
@@ -15,10 +25,6 @@ defmodule Domain.Google.AuthProvider.Query do
 
   def by_auth_provider_id(querable, auth_provider_id) do
     where(querable, [providers: providers], providers.auth_provider_id == ^auth_provider_id)
-  end
-
-  def by_directory_id(queryable, directory_id) do
-    where(queryable, [providers: providers], providers.directory_id == ^directory_id)
   end
 
   def by_hosted_domain(queryable, hosted_domain) do

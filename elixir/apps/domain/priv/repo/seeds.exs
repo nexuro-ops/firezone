@@ -6,8 +6,8 @@ defmodule Domain.Repo.Seeds do
     Repo,
     Accounts,
     Auth,
+    AuthProviders,
     Actors,
-    Directories,
     Entra,
     Google,
     Identities,
@@ -383,7 +383,7 @@ defmodule Domain.Repo.Seeds do
 
     {:ok, google_directory} =
       Google.create_directory(
-        %{jit_provisioning: true, name: "Google", hosted_domain: "firezone.dev"},
+        %{name: "Google", hosted_domain: "firezone.dev"},
         admin_subject
       )
 
@@ -413,7 +413,7 @@ defmodule Domain.Repo.Seeds do
 
     {:ok, entra_directory} =
       Entra.create_directory(
-        %{jit_provisioning: true, name: "Entra", tenant_id: "CHANGE_ME"},
+        %{name: "Entra", tenant_id: "CHANGE_ME"},
         admin_subject
       )
 
@@ -443,7 +443,7 @@ defmodule Domain.Repo.Seeds do
 
     {:ok, okta_directory} =
       Domain.Okta.create_directory(
-        %{jit_provisioning: true, name: "Okta", org_domain: "CHANGE_ME"},
+        %{name: "Okta", org_domain: "CHANGE_ME"},
         admin_subject
       )
 
@@ -465,15 +465,12 @@ defmodule Domain.Repo.Seeds do
       Domain.Okta.create_auth_provider(
         %{
           name: "Okta",
-          directory_id: okta_directory.directory_id,
           org_domain: "CHANGE_ME",
           client_id: "CHANGE_ME",
           client_secret: "CHANGE_ME"
         },
         admin_subject
       )
-
-    {:ok, _firezone_directory} = Domain.Firezone.create_directory(%{}, admin_subject)
 
     {:ok, service_account_actor_encoded_token} =
       Auth.create_service_account_token(

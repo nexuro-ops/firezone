@@ -3,12 +3,8 @@ defmodule Domain.Repo.Migrations.CreateEmailAuthProviders do
 
   def change do
     create table(:email_auth_providers, primary_key: false) do
-      account()
-
+      account(primary_key: true)
       add(:auth_provider_id, :binary_id, null: false, primary_key: true)
-      add(:directory_id, :binary_id, null: false)
-
-      add(:disabled_at, :utc_datetime_usec)
 
       subject_trail()
       timestamps()
@@ -27,20 +23,6 @@ defmodule Domain.Repo.Migrations.CreateEmailAuthProviders do
       """
       ALTER TABLE email_auth_providers
       DROP CONSTRAINT email_auth_providers_auth_provider_id_fkey
-      """
-    )
-
-    execute(
-      """
-      ALTER TABLE email_auth_providers
-      ADD CONSTRAINT email_auth_providers_directory_id_fkey
-      FOREIGN KEY (account_id, directory_id)
-      REFERENCES directories(account_id, id)
-      ON DELETE CASCADE
-      """,
-      """
-      ALTER TABLE email_auth_providers
-      DROP CONSTRAINT email_auth_providers_directory_id_fkey
       """
     )
   end

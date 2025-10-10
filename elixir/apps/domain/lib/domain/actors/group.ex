@@ -5,6 +5,9 @@ defmodule Domain.Actors.Group do
     field :name, :string
     field :type, Ecto.Enum, values: ~w[managed static]a
 
+    field :issuer, :string
+    field :idp_id, :string
+
     # Those fields will be set for groups we synced from IdP's
     belongs_to :provider, Domain.Auth.Provider
     field :provider_identifier, :string
@@ -23,7 +26,6 @@ defmodule Domain.Actors.Group do
     has_many :actors, through: [:memberships, :actor]
 
     belongs_to :account, Domain.Accounts.Account
-    belongs_to :directory, Domain.Directories.Directory
 
     # TODO: HARD-DELETE - Remove field after soft deletion is removed
     field :deleted_at, :utc_datetime_usec

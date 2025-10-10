@@ -5,6 +5,7 @@ defmodule Web.OIDCController do
     Accounts,
     Actors,
     Auth,
+    AuthProviders,
     Entra,
     Google,
     Identities,
@@ -59,6 +60,7 @@ defmodule Web.OIDCController do
          true = Plug.Crypto.secure_compare(cookie["state"], state),
          {:ok, account} <- Accounts.fetch_account_by_id_or_slug(cookie["account_id"]),
          {:ok, provider} <- fetch_auth_provider(account, cookie),
+         :ok <- validate_context(provider, context_type(cookie["params"])),
          {:ok, config} <- fetch_config(provider),
          {:ok, tokens} <- fetch_tokens(config, code, cookie["verifier"]),
          {:ok, claims} <- OpenIDConnect.verify(config, tokens["id_token"]),
@@ -117,35 +119,23 @@ defmodule Web.OIDCController do
     OpenIDConnect.fetch_tokens(config, params)
   end
 
-  defp fetch_auth_provider(account, %{
-         "auth_provider_type" => "google",
-         "auth_provider_id" => auth_provider_id
-       }) do
-    Google.fetch_auth_provider_by_auth_provider_id(account, auth_provider_id)
+  defp fetch_auth_provider(account, %{"auth_provider_type" => "google"} = params) do
+    Google.fetch_auth_provider_by_auth_provider_id(account, params["auth_provider_id"])
   end
 
-  defp fetch_auth_provider(account, %{
-         "auth_provider_type" => "okta",
-         "auth_provider_id" => auth_provider_id
-       }) do
-    Okta.fetch_auth_provider_by_auth_provider_id(account, auth_provider_id)
+  defp fetch_auth_provider(account, %{"auth_provider_type" => "okta"} = params) do
+    Okta.fetch_auth_provider_by_auth_provider_id(account, params["auth_provider_id"])
   end
 
-  defp fetch_auth_provider(account, %{
-         "auth_provider_type" => "entra",
-         "auth_provider_id" => auth_provider_id
-       }) do
-    Entra.fetch_auth_provider_by_auth_provider_id(account, auth_provider_id)
+  defp fetch_auth_provider(account, %{"auth_provider_type" => "entra"} = params) do
+    Entra.fetch_auth_provider_by_auth_provider_id(account, params["auth_provider_id"])
   end
 
-  defp fetch_auth_provider(account, %{
-         "auth_provider_type" => "oidc",
-         "auth_provider_id" => auth_provider_id
-       }) do
-    OIDC.fetch_auth_provider_by_auth_provider_id(account, auth_provider_id)
+  defp fetch_auth_provider(account, %{"auth_provider_type" => "oidc"} = params) do
+    OIDC.fetch_auth_provider_by_auth_provider_id(account, params["auth_provider_id"])
   end
 
-  defp fetch_auth_provider(_account, _provider) do
+  defp fetch_auth_provider(_account, _params) do
     {:error, :invalid_provider}
   end
 
@@ -206,8 +196,14 @@ defmodule Web.OIDCController do
     {:error, :invalid_provider}
   end
 
-  defp fetch_identity(account, directory_id, claims) do
-    Identities.fetch_identity_for_sign_in(account, directory_id, claims)
+  # Entra "oid" is consistent across OAuth clients while "sub" is not, so we use that to keep identities / actors deduped
+  defp fetch_identity(account, %Entra.AuthProvider{}, %{"iss" => issuer, "oid" => idp_id}) do
+    Identities.fetch_identity_by_issuer_and_idp_id(account, issuer, idp_id)
+  end
+
+  # All other providers maintain a consistent "sub" across OAuth clients
+  defp fetch_identity(account, _provider, %{"iss" => issuer, "sub" => idp_id}) do
+    Identities.fetch_identity_by_issuer_and_idp_id(account, issuer, idp_id)
   end
 
   defp check_admin(
@@ -220,6 +216,18 @@ defmodule Web.OIDCController do
     do: :ok
 
   defp check_admin(_identity, _context_type), do: {:error, :not_admin}
+
+  defp validate_context(%AuthProviders.AuthProvider{context: context}, :client)
+       when context in [:clients_only, :clients_and_portal] do
+    :ok
+  end
+
+  defp validate_context(%AuthProviders.AuthProvider{context: context}, :browser)
+       when context in [:portal_only, :clients_and_portal] do
+    :ok
+  end
+
+  defp validate_context(_provider, _context_type), do: {:error, :invalid_context}
 
   defp create_token(conn, identity, params) do
     user_agent = conn.assigns[:user_agent]

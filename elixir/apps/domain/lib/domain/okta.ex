@@ -6,8 +6,8 @@ defmodule Domain.Okta do
     Repo
   }
 
-  def all_enabled_directories_for_account!(%Accounts.Account{} = account) do
-    Okta.Directory.Query.not_disabled()
+  def all_directories_for_account!(%Accounts.Account{} = account) do
+    Okta.Directory.Query.all()
     |> Okta.Directory.Query.by_account_id(account.id)
     |> Repo.all()
   end
