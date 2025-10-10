@@ -20,6 +20,7 @@ defmodule Domain.Repo.Migrations.RelaxProviderIdNullOnAuthIdentities do
 
     alter table(:auth_identities) do
       modify(:provider_id, :binary_id, null: true, from: {:binary_id, null: false})
+      modify(:provider_identifier, :string, null: true, from: {:string, null: false})
     end
 
     create(

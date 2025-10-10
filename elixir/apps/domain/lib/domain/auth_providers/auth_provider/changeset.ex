@@ -1,21 +1,10 @@
 defmodule Domain.AuthProviders.AuthProvider.Changeset do
   use Domain, :changeset
 
-  alias Domain.{
-    Auth,
-    AuthProviders.AuthProvider
-  }
+  alias Domain.AuthProviders.AuthProvider
 
   @required_fields ~w[account_id type context created_by created_by_subject]a
   @update_fields ~w[context disabled_at]a
-
-  def create(attrs, %Auth.Subject{} = subject) do
-    %AuthProvider{}
-    |> cast(attrs, @required_fields)
-    |> put_change(:account_id, subject.account.id)
-    |> put_subject_trail(:created_by, subject)
-    |> changeset()
-  end
 
   def update(%AuthProvider{} = auth_provider, attrs) do
     auth_provider
@@ -23,7 +12,7 @@ defmodule Domain.AuthProviders.AuthProvider.Changeset do
     |> changeset()
   end
 
-  def changeset(changeset) do
+  defp changeset(changeset) do
     changeset
     |> validate_required(@required_fields)
     |> assoc_constraint(:account)

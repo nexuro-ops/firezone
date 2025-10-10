@@ -3,23 +3,38 @@ defmodule Domain.Google.AuthProvider.Changeset do
 
   alias Domain.{
     Auth,
-    Google.AuthProvider
+    AuthProviders,
+    Google
   }
 
-  @required_fields ~w[name account_id auth_provider_id hosted_domain created_by created_by_subject]a
+  @required_fields ~w[name account_id hosted_domain created_by created_by_subject]a
   @update_fields ~w[name hosted_domain]a
 
   def create(attrs, %Auth.Subject{} = subject) do
-    %AuthProvider{}
+    %Google.AuthProvider{}
     |> cast(attrs, @required_fields)
     |> put_change(:account_id, subject.account.id)
     |> put_subject_trail(:created_by, subject)
+    |> put_parent_assoc(attrs)
     |> changeset()
   end
 
-  def update(%AuthProvider{} = auth_provider, attrs) do
+  defp put_parent_assoc(changeset, %{"auth_provider" => %AuthProviders.AuthProvider{} = provider}) do
+    put_assoc(changeset, :auth_provider, provider)
+  end
+
+  defp put_parent_assoc(changeset, %{auth_provider: %AuthProviders.AuthProvider{} = provider}) do
+    put_assoc(changeset, :auth_provider, provider)
+  end
+
+  defp put_parent_assoc(changeset, _attrs) do
+    add_error(changeset, :auth_provider, "must be specified")
+  end
+
+  def update(%Google.AuthProvider{} = auth_provider, attrs) do
     auth_provider
     |> cast(attrs, @update_fields)
+    |> validate_required(:auth_provider_id)
     |> changeset()
   end
 
