@@ -3,41 +3,43 @@ defmodule Domain.Okta.AuthProvider.Changeset do
 
   alias Domain.{
     Auth,
-    Okta.AuthProvider
+    AuthProviders,
+    Okta
   }
 
-  @required_fields ~w[name account_id auth_provider_id
-    org_domain client_id client_secret created_by created_by_subject]a
+  @required_fields ~w[name context org_domain client_id client_secret]a
+  @fields @required_fields ++ ~w[disabled_at]a
 
-  def create(attrs, %Auth.Subject{} = subject) do
-    %AuthProvider{}
-    |> cast(attrs, @required_fields)
-    |> put_change(:account_id, subject.account.id)
-    |> put_subject_trail(:created_by, subject)
-    |> changeset()
-  end
-
-  def update(%AuthProvider{} = auth_provider, attrs) do
+  def create(
+        %Okta.AuthProvider{} = auth_provider \\ %Okta.AuthProvider{},
+        attrs,
+        %Auth.Subject{} = subject
+      ) do
     auth_provider
-    |> cast(attrs, ~w[name org_domain disabled_at client_id client_secret]a)
+    |> cast(attrs, @fields)
+    |> validate_required(@required_fields)
+    |> put_subject_trail(:created_by, subject)
+    |> put_change(:account_id, subject.account.id)
+    |> put_assoc(:auth_provider, %AuthProviders.AuthProvider{account_id: subject.account.id})
     |> changeset()
   end
 
-  def changeset(changeset) do
-    changeset
+  def update(%Okta.AuthProvider{} = auth_provider, attrs) do
+    auth_provider
+    |> cast(attrs, @fields)
     |> validate_required(@required_fields)
+    |> changeset()
+  end
+
+  defp changeset(changeset) do
+    changeset
     |> validate_length(:org_domain, min: 1, max: 255)
     |> validate_length(:client_id, min: 1, max: 255)
     |> validate_length(:client_secret, min: 1, max: 255)
     |> assoc_constraint(:account)
     |> assoc_constraint(:auth_provider)
-    |> unique_constraint([:account_id, :client_id],
-      name: :okta_auth_providers_account_id_client_id_index,
-      message: "is already configured for this account and client_id"
-    )
-    |> unique_constraint([:account_id, :name],
-      name: :okta_auth_providers_account_id_name_index,
-      message: "is already configured for this account with this name"
-    )
+    |> unique_constraint(:org_domain, name: :okta_auth_providers_pkey)
+    |> unique_constraint(:name, name: :okta_auth_providers_account_id_name_index)
+    |> check_constraint(:context, name: :context_must_be_valid)
   end
 end

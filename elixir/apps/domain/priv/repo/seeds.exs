@@ -6,7 +6,6 @@ defmodule Domain.Repo.Seeds do
     Repo,
     Accounts,
     Auth,
-    AuthProviders,
     Actors,
     Entra,
     Google,

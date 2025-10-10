@@ -5,7 +5,6 @@ defmodule Web.OIDCController do
     Accounts,
     Actors,
     Auth,
-    AuthProviders,
     Entra,
     Google,
     Identities,
@@ -217,12 +216,12 @@ defmodule Web.OIDCController do
 
   defp check_admin(_identity, _context_type), do: {:error, :not_admin}
 
-  defp validate_context(%AuthProviders.AuthProvider{context: context}, :client)
+  defp validate_context(%{context: context}, :client)
        when context in [:clients_only, :clients_and_portal] do
     :ok
   end
 
-  defp validate_context(%AuthProviders.AuthProvider{context: context}, :browser)
+  defp validate_context(%{context: context}, :browser)
        when context in [:portal_only, :clients_and_portal] do
     :ok
   end

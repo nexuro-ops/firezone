@@ -7,50 +7,37 @@ defmodule Domain.Google.AuthProvider.Changeset do
     Google
   }
 
-  @required_fields ~w[name account_id hosted_domain created_by created_by_subject]a
-  @update_fields ~w[name hosted_domain]a
+  @required_fields ~w[name context]a
+  @fields @required_fields ++ ~w[disabled_at hosted_domain]a
 
-  def create(attrs, %Auth.Subject{} = subject) do
-    %Google.AuthProvider{}
-    |> cast(attrs, @required_fields)
-    |> put_change(:account_id, subject.account.id)
+  def create(
+        %Google.AuthProvider{} = auth_provider \\ %Google.AuthProvider{},
+        attrs,
+        %Auth.Subject{} = subject
+      ) do
+    auth_provider
+    |> cast(attrs, @fields)
+    |> validate_required(@required_fields)
     |> put_subject_trail(:created_by, subject)
-    |> put_parent_assoc(attrs)
+    |> put_change(:account_id, subject.account.id)
+    |> put_assoc(:auth_provider, %AuthProviders.AuthProvider{account_id: subject.account.id})
     |> changeset()
-  end
-
-  defp put_parent_assoc(changeset, %{"auth_provider" => %AuthProviders.AuthProvider{} = provider}) do
-    put_assoc(changeset, :auth_provider, provider)
-  end
-
-  defp put_parent_assoc(changeset, %{auth_provider: %AuthProviders.AuthProvider{} = provider}) do
-    put_assoc(changeset, :auth_provider, provider)
-  end
-
-  defp put_parent_assoc(changeset, _attrs) do
-    add_error(changeset, :auth_provider, "must be specified")
   end
 
   def update(%Google.AuthProvider{} = auth_provider, attrs) do
     auth_provider
-    |> cast(attrs, @update_fields)
-    |> validate_required(:auth_provider_id)
+    |> cast(attrs, @fields)
+    |> validate_required(@required_fields)
     |> changeset()
   end
 
-  def changeset(changeset) do
+  defp changeset(changeset) do
     changeset
-    |> validate_required(@required_fields)
     |> validate_length(:hosted_domain, min: 1, max: 255)
     |> assoc_constraint(:account)
     |> assoc_constraint(:auth_provider)
-    |> unique_constraint([:account_id, :hosted_domain],
-      name: :google_auth_providers_pkey,
-      message: "is already configured for this account and Google Workspace domain"
-    )
-    |> unique_constraint([:account_id, :name],
-      name: :google_auth_providers_account_id_name_index,
-      message: "is already configured for this account with this name"
-    )
+    |> unique_constraint(:hosted_domain, name: :google_auth_providers_pkey)
+    |> unique_constraint(:name, name: :google_auth_providers_account_id_name_index)
+    |> check_constraint(:context, name: :context_must_be_valid)
   end
 end
