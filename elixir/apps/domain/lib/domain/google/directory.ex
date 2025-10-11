@@ -5,6 +5,7 @@ defmodule Domain.Google.Directory do
   schema "google_directories" do
     belongs_to :account, Domain.Accounts.Account, primary_key: true
     field :hosted_domain, :string, primary_key: true
+    field :issuer, :string
 
     field :name, :string
     field :superadmin_email, :string

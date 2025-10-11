@@ -8,7 +8,10 @@ defmodule Domain.Auth.Identity do
     # Unique identifiers
     field :email, :string
     field :provider_identifier, :string
-    field :issuer, :string
+
+    # Identity Provider fields
+    field :issuer
+    field :idp_tenant, :string
     field :idp_id, :string
 
     # Optional profile fields

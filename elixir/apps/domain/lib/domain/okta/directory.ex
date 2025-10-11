@@ -5,6 +5,7 @@ defmodule Domain.Okta.Directory do
   schema "okta_directories" do
     belongs_to :account, Domain.Accounts.Account, primary_key: true
     field :org_domain, :string, primary_key: true
+    field :issuer, :string
 
     field :name, :string
     field :error_count, :integer, read_after_writes: true

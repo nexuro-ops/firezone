@@ -382,7 +382,7 @@ defmodule Domain.Repo.Seeds do
 
     {:ok, _google_directory} =
       Google.create_directory(
-        %{name: "Google", hosted_domain: "firezone.dev"},
+        %{name: "Google", issuer: "https://accounts.google.com", hosted_domain: "firezone.dev"},
         admin_subject
       )
 
@@ -406,7 +406,11 @@ defmodule Domain.Repo.Seeds do
 
     {:ok, _entra_directory} =
       Entra.create_directory(
-        %{name: "Entra", tenant_id: "CHANGE_ME"},
+        %{
+          name: "Entra",
+          issuer: "https://login.microsoftonline.com/CHANGE_ME/v2.0",
+          tenant_id: "CHANGE_ME"
+        },
         admin_subject
       )
 
@@ -433,6 +437,7 @@ defmodule Domain.Repo.Seeds do
         %{
           name: "Okta",
           org_domain: "CHANGE_ME",
+          issuer: "https://CHANGE_ME.okta.com/oauth2/default",
           client_id: "SERVICE_APP_CLIENT_ID",
           client_secret: "SERVICE_APP_CLIENT_SECRET"
         },

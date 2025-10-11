@@ -5,6 +5,7 @@ defmodule Domain.Repo.Migrations.CreateGoogleDirectories do
     create table(:google_directories, primary_key: false) do
       account(primary_key: true)
       add(:hosted_domain, :string, null: false, primary_key: true)
+      add(:issuer, :text, null: false)
 
       add(:name, :string, null: false)
       add(:superadmin_email, :string)

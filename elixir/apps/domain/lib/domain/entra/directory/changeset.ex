@@ -6,7 +6,8 @@ defmodule Domain.Entra.Directory.Changeset do
     Entra.Directory
   }
 
-  @required_fields ~w[name account_id tenant_id created_by created_by_subject]a
+  @required_fields ~w[name tenant_id issuer]a
+  @update_fields ~w[name error_count disabled_at disabled_reason synced_at error error_emailed_at]a
 
   def create(attrs, %Auth.Subject{} = subject) do
     %Directory{}
@@ -18,10 +19,7 @@ defmodule Domain.Entra.Directory.Changeset do
 
   def update(%Directory{} = directory, attrs) do
     directory
-    |> cast(
-      attrs,
-      ~w[name tenant_id error_count disabled_at disabled_reason synced_at error error_emailed_at]a
-    )
+    |> cast(attrs, @update_fields)
     |> changeset()
   end
 
@@ -29,6 +27,8 @@ defmodule Domain.Entra.Directory.Changeset do
     changeset
     |> validate_required(@required_fields)
     |> validate_length(:tenant_id, min: 1, max: 255)
+    |> validate_length(:issuer, min: 1, max: 2_000)
+    |> validate_length(:name, min: 1, max: 255)
     |> validate_number(:error_count, greater_than_or_equal_to: 0)
     |> validate_length(:error, max: 2_000)
     |> assoc_constraint(:account)
