@@ -9,6 +9,7 @@ defmodule Domain.Repo.Migrations.CreateEntraAuthProviders do
       add(:context, :string, null: false)
       add(:disabled_at, :utc_datetime_usec)
 
+      add(:issuer, :text, null: false)
       add(:name, :string, null: false)
       add(:tenant_id, :string, null: false)
 
@@ -16,7 +17,7 @@ defmodule Domain.Repo.Migrations.CreateEntraAuthProviders do
       timestamps()
     end
 
-    create(index(:entra_auth_providers, [:account_id, :tenant_id], unique: true))
+    create(index(:entra_auth_providers, [:account_id, :issuer], unique: true))
     create(index(:entra_auth_providers, [:account_id, :name], unique: true))
 
     execute(

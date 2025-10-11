@@ -9,6 +9,7 @@ defmodule Domain.Repo.Migrations.CreateOidcAuthProviders do
       add(:context, :string, null: false)
       add(:disabled_at, :utc_datetime_usec)
 
+      add(:issuer, :text, null: false)
       add(:name, :string, null: false)
       add(:client_id, :string, null: false)
       add(:client_secret, :string, null: false)
@@ -18,7 +19,7 @@ defmodule Domain.Repo.Migrations.CreateOidcAuthProviders do
       timestamps()
     end
 
-    create(index(:oidc_auth_providers, [:account_id, :client_id], unique: true))
+    create(index(:oidc_auth_providers, [:account_id, :issuer], unique: true))
     create(index(:oidc_auth_providers, [:account_id, :name], unique: true))
 
     execute(

@@ -5,8 +5,8 @@ defmodule Domain.Entra.Directory do
   schema "entra_directories" do
     belongs_to :account, Domain.Accounts.Account, primary_key: true
     field :tenant_id, :string, primary_key: true
-    field :issuer, :string
 
+    field :issuer, :string
     field :name, :string
     field :error_count, :integer, read_after_writes: true
     field :disabled_at, :utc_datetime_usec

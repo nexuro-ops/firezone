@@ -70,6 +70,10 @@ defmodule Domain.Auth.Identity.Query do
     where(queryable, [identities: identities], identities.issuer == ^issuer)
   end
 
+  def by_idp_tenant(queryable, idp_tenant) do
+    where(queryable, [identities: identities], identities.idp_tenant == ^idp_tenant)
+  end
+
   def by_idp_id(queryable, idp_id) do
     where(queryable, [identities: identities], identities.idp_id == ^idp_id)
   end

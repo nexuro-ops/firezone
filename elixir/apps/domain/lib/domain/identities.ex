@@ -6,10 +6,11 @@ defmodule Domain.Identities do
     Repo
   }
 
-  def fetch_identity_by_issuer_and_idp_id(%Accounts.Account{} = account, issuer, idp_id) do
-    Identity.Query.not_deleted()
+  def fetch_identity_by_idp_fields(%Accounts.Account{} = account, issuer, idp_tenant, idp_id) do
+    Identity.Query.all()
     |> Identity.Query.by_account_id(account.id)
     |> Identity.Query.by_issuer(issuer)
+    |> Identity.Query.by_idp_tenant(idp_tenant)
     |> Identity.Query.by_idp_id(idp_id)
     |> Repo.fetch(Identity.Query, preload: :actor)
   end

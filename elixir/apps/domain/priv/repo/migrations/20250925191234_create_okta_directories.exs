@@ -5,8 +5,8 @@ defmodule Domain.Repo.Migrations.CreateOktaDirectories do
     create table(:okta_directories, primary_key: false) do
       account(primary_key: true)
       add(:org_domain, :string, null: false, primary_key: true)
-      add(:issuer, :text, null: false)
 
+      add(:issuer, :text, null: false)
       add(:client_id, :string)
       add(:client_secret, :string)
 
@@ -22,6 +22,7 @@ defmodule Domain.Repo.Migrations.CreateOktaDirectories do
       timestamps()
     end
 
+    create(index(:okta_directories, [:account_id, :issuer], unique: true))
     create(index(:okta_directories, [:account_id, :name], unique: true))
   end
 end

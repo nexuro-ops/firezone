@@ -9,6 +9,7 @@ defmodule Domain.Repo.Migrations.CreateGoogleAuthProviders do
       add(:context, :string, null: false)
       add(:disabled_at, :utc_datetime_usec)
 
+      add(:issuer, :text, null: false)
       add(:name, :string, null: false)
       add(:hosted_domain, :string)
 
@@ -16,7 +17,7 @@ defmodule Domain.Repo.Migrations.CreateGoogleAuthProviders do
       timestamps()
     end
 
-    create(index(:google_auth_providers, [:account_id, :hosted_domain], unique: true))
+    create(index(:google_auth_providers, [:account_id, :issuer, :hosted_domain], unique: true))
     create(index(:google_auth_providers, [:account_id, :name], unique: true))
 
     execute(

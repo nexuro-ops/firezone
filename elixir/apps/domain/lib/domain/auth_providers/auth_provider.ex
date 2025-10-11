@@ -9,8 +9,8 @@ defmodule Domain.AuthProviders.AuthProvider do
     has_one :email_auth_provider, Domain.Email.AuthProvider, references: :id
     has_one :userpass_auth_provider, Domain.Userpass.AuthProvider, references: :id
     has_one :google_auth_provider, Domain.Google.AuthProvider, references: :id
-    has_one :okta_auth_provider, Domain.Okta.AuthProvider, where: [type: :okta], references: :id
+    has_one :okta_auth_provider, Domain.Okta.AuthProvider, references: :id
     has_one :entra_auth_provider, Domain.Entra.AuthProvider, references: :id
-    has_one :oidc_auth_provider, Domain.OIDC.AuthProvider, where: [type: :oidc], references: :id
+    has_one :oidc_auth_provider, Domain.OIDC.AuthProvider, references: :id
   end
 end

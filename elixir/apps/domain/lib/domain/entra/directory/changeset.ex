@@ -32,8 +32,11 @@ defmodule Domain.Entra.Directory.Changeset do
     |> validate_number(:error_count, greater_than_or_equal_to: 0)
     |> validate_length(:error, max: 2_000)
     |> assoc_constraint(:account)
-    |> unique_constraint([:account_id, :tenant_id],
+    |> unique_constraint(:issuer,
+      name: :entra_directories_account_id_issuer_index,
       message: "is already configured for this account and Entra tenant"
     )
+    |> unique_constraint(:name, name: :entra_directories_account_id_name_index)
+    |> foreign_key_constraint(:account_id, name: :entra_directories_account_id_fkey)
   end
 end

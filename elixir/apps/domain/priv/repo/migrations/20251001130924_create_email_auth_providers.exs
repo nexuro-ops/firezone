@@ -6,6 +6,7 @@ defmodule Domain.Repo.Migrations.CreateEmailAuthProviders do
       account(primary_key: true)
       add(:auth_provider_id, :binary_id, null: false, primary_key: true)
 
+      add(:issuer, :text, null: false, default: "firezone")
       add(:context, :string, null: false)
       add(:disabled_at, :utc_datetime_usec)
 
@@ -33,6 +34,10 @@ defmodule Domain.Repo.Migrations.CreateEmailAuthProviders do
       constraint(:email_auth_providers, :context_must_be_valid,
         check: "context IN ('clients_and_portal', 'clients_only', 'portal_only')"
       )
+    )
+
+    create(
+      constraint(:email_auth_providers, :issuer_must_be_firezone, check: "issuer = 'firezone'")
     )
   end
 end

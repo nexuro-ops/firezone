@@ -9,6 +9,7 @@ defmodule Domain.Repo.Migrations.CreateOktaAuthProviders do
       add(:context, :string, null: false)
       add(:disabled_at, :utc_datetime_usec)
 
+      add(:issuer, :text, null: false)
       add(:name, :string, null: false)
       add(:org_domain, :string, null: false)
       add(:client_id, :string, null: false)
@@ -18,7 +19,7 @@ defmodule Domain.Repo.Migrations.CreateOktaAuthProviders do
       timestamps()
     end
 
-    create(index(:okta_auth_providers, [:account_id, :client_id], unique: true))
+    create(index(:okta_auth_providers, [:account_id, :issuer], unique: true))
     create(index(:okta_auth_providers, [:account_id, :name], unique: true))
 
     execute(

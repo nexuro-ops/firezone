@@ -195,14 +195,63 @@ defmodule Web.OIDCController do
     {:error, :invalid_provider}
   end
 
-  # Entra "oid" is consistent across OAuth clients while "sub" is not, so we use that to keep identities / actors deduped
-  defp fetch_identity(account, %Entra.AuthProvider{}, %{"iss" => issuer, "oid" => idp_id}) do
-    Identities.fetch_identity_by_issuer_and_idp_id(account, issuer, idp_id)
+  # Entra
+  defp fetch_identity(
+         account,
+         %Entra.AuthProvider{
+           issuer: issuer,
+           tenant_id: idp_tenant
+         },
+         %{
+           "iss" => issuer,
+           "oid" => idp_id,
+           "tid" => idp_tenant
+         }
+       ) do
+    Identities.fetch_identity_by_idp_fields(account, issuer, idp_tenant, idp_id)
   end
 
-  # All other providers maintain a consistent "sub" across OAuth clients
-  defp fetch_identity(account, _provider, %{"iss" => issuer, "sub" => idp_id}) do
-    Identities.fetch_identity_by_issuer_and_idp_id(account, issuer, idp_id)
+  # Google
+  defp fetch_identity(
+         account,
+         %Google.AuthProvider{
+           issuer: issuer,
+           hosted_domain: idp_tenant
+         },
+         %{
+           "iss" => issuer,
+           "sub" => idp_id,
+           "hd" => idp_tenant
+         }
+       ) do
+    Identities.fetch_identity_by_idp_fields(account, issuer, idp_tenant, idp_id)
+  end
+
+  # Okta
+  defp fetch_identity(
+         account,
+         %Okta.AuthProvider{
+           issuer: issuer,
+           org_domain: idp_tenant
+         },
+         %{
+           "iss" => "https://" <> idp_tenant <> "/oauth2/" <> _rest = issuer,
+           "sub" => idp_id
+         }
+       ) do
+    Identities.fetch_identity_by_idp_fields(account, issuer, idp_tenant, idp_id)
+  end
+
+  # Generic OIDC
+  defp fetch_identity(
+         account,
+         %OIDC.AuthProvider{issuer: issuer},
+         %{
+           "iss" => issuer,
+           "sub" => idp_id
+         }
+       ) do
+    Identities.fetch_identity_by_idp_fields(account, issuer, nil, idp_id)
   end
 
   defp check_admin(

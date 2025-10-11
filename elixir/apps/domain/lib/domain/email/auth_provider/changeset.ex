@@ -38,5 +38,10 @@ defmodule Domain.Email.AuthProvider.Changeset do
     |> unique_constraint(:account_id, name: :email_auth_providers_pkey)
     |> unique_constraint(:name, name: :email_auth_providers_account_id_name_index)
     |> check_constraint(:context, name: :context_must_be_valid)
+    |> check_constraint(:issuer, name: :issuer_must_be_firezone)
+    |> foreign_key_constraint(:account_id, name: :email_auth_providers_account_id_fkey)
+    |> foreign_key_constraint(:auth_provider_id,
+      name: :email_auth_providers_auth_provider_id_fkey
+    )
   end
 end

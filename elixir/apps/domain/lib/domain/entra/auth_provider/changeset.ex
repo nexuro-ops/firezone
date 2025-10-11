@@ -7,7 +7,7 @@ defmodule Domain.Entra.AuthProvider.Changeset do
     Entra
   }
 
-  @required_fields ~w[name context tenant_id]a
+  @required_fields ~w[name context tenant_id issuer]a
   @fields @required_fields ++ ~w[disabled_at]a
 
   def create(
@@ -34,10 +34,15 @@ defmodule Domain.Entra.AuthProvider.Changeset do
   defp changeset(changeset) do
     changeset
     |> validate_length(:tenant_id, min: 1, max: 255)
+    |> validate_length(:issuer, min: 1, max: 2_000)
     |> assoc_constraint(:account)
     |> assoc_constraint(:auth_provider)
-    |> unique_constraint(:tenant_id, name: :entra_auth_providers_pkey)
+    |> unique_constraint(:issuer, name: :entra_auth_providers_account_id_issuer_index)
     |> unique_constraint(:name, name: :entra_auth_providers_account_id_name_index)
     |> check_constraint(:context, name: :context_must_be_valid)
+    |> foreign_key_constraint(:account_id, name: :entra_auth_providers_account_id_fkey)
+    |> foreign_key_constraint(:auth_provider_id,
+      name: :entra_auth_providers_auth_provider_id_fkey
+    )
   end
 end
